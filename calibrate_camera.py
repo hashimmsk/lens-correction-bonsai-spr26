@@ -10,12 +10,13 @@ distortion coefficients using the Kannala-Brandt model
 Usage examples:
 
     # Calibrate from wide-lens checkerboard videos
-    python calibrate_camera.py "data/Wide lens video.MP4" \\
-        "data/Wide lens angle 3.MP4" "data/Wide lens angle 4.MP4" \\
-        --board-width 9 --board-height 6 --square-size 25.0
+    python calibrate_camera.py "data/input/Wide lens video.MP4" \\
+        "data/input/Wide lens angle 3.MP4" "data/input/Wide lens angle 4.MP4" \\
+        --board-width 9 --board-height 6 --square-size 25.0 \\
+        --output data/calibration/calibration.npz --sample-dir data/calibration
 
     # Use all 4 distortion params (less stable, sometimes needed)
-    python calibrate_camera.py "data/Wide lens video.MP4" --distortion-params 4
+    python calibrate_camera.py "data/input/Wide lens video.MP4" --distortion-params 4
 """
 
 import argparse
@@ -222,7 +223,7 @@ def main():
         help="Number of active distortion coefficients (2 recommended).",
     )
     parser.add_argument(
-        "--output", type=str, default="calibration.npz",
+        "--output", type=str, default="data/calibration/calibration.npz",
         help="Output path for the calibration file.",
     )
     parser.add_argument(
@@ -230,7 +231,7 @@ def main():
         help="Number of annotated sample frames to save (0 to disable).",
     )
     parser.add_argument(
-        "--sample-dir", type=str, default="calibration_samples",
+        "--sample-dir", type=str, default="data/calibration",
         help="Directory to save annotated sample frames.",
     )
     args = parser.parse_args()
