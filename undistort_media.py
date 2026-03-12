@@ -8,15 +8,17 @@ corrects barrel/fisheye distortion with cv2.fisheye remap.
 Usage examples:
 
     # Single video
-    python undistort_media.py calibration.npz "data/Wide lens video.MP4" \\
-        -o output/corrected.mp4
+    python undistort_media.py data/calibration/calibration.npz \\
+        "data/input/Wide lens video.MP4" -o data/output/corrected.mp4
 
     # Multiple videos into an output directory
-    python undistort_media.py calibration.npz "data/Wide lens angle 3.MP4" \\
-        "data/Wide lens angle 4.MP4" -o output/
+    python undistort_media.py data/calibration/calibration.npz \\
+        "data/input/Wide lens angle 3.MP4" \\
+        "data/input/Wide lens angle 4.MP4" -o data/output/
 
     # Adjust balance (0=tight crop, 1=keep full FOV with black borders)
-    python undistort_media.py calibration.npz input.mp4 -o out.mp4 --balance 0.3
+    python undistort_media.py data/calibration/calibration.npz \\
+        input.mp4 -o out.mp4 --balance 0.3
 """
 
 import argparse
@@ -180,7 +182,7 @@ def main():
         help="Input image(s) or video(s) to undistort.",
     )
     parser.add_argument(
-        "-o", "--output", default="output",
+        "-o", "--output", default="data/output",
         help="Output file (single input) or directory (multiple inputs).",
     )
     parser.add_argument(
