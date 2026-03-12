@@ -231,8 +231,8 @@ def main():
         help="Number of annotated sample frames to save (0 to disable).",
     )
     parser.add_argument(
-        "--sample-dir", type=str, default="data/calibration",
-        help="Directory to save annotated sample frames.",
+        "--sample-dir", type=str, default="data/calibration/corner_detection",
+        help="Directory to save annotated corner-detection frames.",
     )
     args = parser.parse_args()
 
@@ -325,7 +325,8 @@ def main():
             K, D, np.eye(3), new_K, image_size, cv2.CV_16SC2)
         undistorted = cv2.remap(sample_img, map1, map2, cv2.INTER_LINEAR,
                                 borderMode=cv2.BORDER_CONSTANT)
-        out_path = os.path.join(args.sample_dir, "undistorted_sample.jpg")
+        cal_dir = os.path.dirname(args.output)
+        out_path = os.path.join(cal_dir, "undistorted_sample.jpg")
         cv2.imwrite(out_path, undistorted)
         print(f"  Sample undistorted frame -> {out_path}")
 
