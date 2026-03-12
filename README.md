@@ -19,46 +19,54 @@ Run calibration on the wide-lens checkerboard videos:
 
 ```bash
 python calibrate_camera.py \
-    "data/wide_lens/Wide lens video.MP4" \
-    "data/wide_lens/Wide lens angle 3.MP4" \
-    "data/wide_lens/Wide lens angle 4.MP4" \
-    "data/wide_lens/Wide lens angle 5.MP4" \
-    "data/wide_lens/Wide lens angle 6.MP4" \
-    "data/wide_lens/Wide lens angle 7.MP4" \
-    "data/wide_lens/Wide lens angle 8.MP4" \
-    "data/wide_lens/Wide lens angle 9.MP4" \
+    "data/input/Wide lens video.MP4" \
+    "data/input/Wide lens angle 3.MP4" \
+    "data/input/Wide lens angle 4.MP4" \
+    "data/input/Wide lens angle 5.MP4" \
+    "data/input/Wide lens angle 6.MP4" \
+    "data/input/Wide lens angle 7.MP4" \
+    "data/input/Wide lens angle 8.MP4" \
+    "data/input/Wide lens angle 9.MP4" \
     --board-width 9 --board-height 6 \
     --square-size 25.0 \
-    --frame-skip 15 \
-    --output calibration.npz
+    --frame-skip 15
 ```
 
 This produces:
-- `calibration.npz` — camera matrix K, distortion coefficients D, metadata
-- `calibration_samples/` — annotated corner-detection images and a sample undistorted frame
+- `data/calibration/calibration.npz` — camera matrix K, distortion coefficients D, metadata
+- `data/calibration/` — annotated corner-detection images and a sample undistorted frame
 
 ### 2. Undistort
 
 Correct a single video:
 
 ```bash
-python undistort_media.py calibration.npz "data/wide_lens/Wide lens video.MP4" \
-    -o "output/Wide lens video_corrected.mp4"
+python undistort_media.py data/calibration/calibration.npz \
+    "data/input/Wide lens video.MP4" \
+    -o "data/output/Wide lens video_corrected.mp4"
 ```
 
-Correct multiple files into an output directory:
+Correct multiple files into the output directory:
 
 ```bash
-python undistort_media.py calibration.npz \
-    "data/wide_lens/Wide lens angle 3.MP4" \
-    "data/wide_lens/Wide lens angle 4.MP4" \
-    -o output/
+python undistort_media.py data/calibration/calibration.npz \
+    "data/input/Wide lens angle 3.MP4" \
+    "data/input/Wide lens angle 4.MP4" \
+    -o data/output/
 ```
 
 Correct a still image:
 
 ```bash
-python undistort_media.py calibration.npz photo.jpg -o photo_corrected.jpg
+python undistort_media.py data/calibration/calibration.npz photo.jpg -o photo_corrected.jpg
+```
+
+### 3. Validate
+
+Compare corrected output against the linear-lens ground truth:
+
+```
+data/output/Wide lens angle 5_corrected.MP4  ←→  data/ground_truth/Linear lens angle 5.MP4
 ```
 
 ## Calibration Options
@@ -73,7 +81,7 @@ python undistort_media.py calibration.npz photo.jpg -o photo_corrected.jpg
 | `--scale` | 1.0 | Resize factor before detection (e.g. 0.5) |
 | `--distortion-params` | 2 | Active distortion coefficients: 2, 3, or 4 |
 | `--save-samples` | 8 | Annotated sample frames to save |
-| `--output` | calibration.npz | Output calibration file |
+| `--output` | data/calibration/calibration.npz | Output calibration file |
 
 ## Undistortion Options
 
@@ -127,17 +135,21 @@ Distortion D:
 ## File Structure
 
 ```
-├── calibrate_camera.py      # Calibration script
-├── undistort_media.py        # Undistortion script
-├── requirements.txt          # Python dependencies
-├── calibration.npz           # Saved calibration (after running)
-├── calibration_samples/      # Visual validation (after running)
-├── data/                     # Input checkerboard videos
-│   ├── wide_lens/            # Fisheye / wide-angle videos
-│   │   ├── Wide lens video.MP4
-│   │   └── Wide lens angle 2-9.MP4
-│   └── linear_lens/          # Standard / linear-lens videos
-│       ├── Linear Lens video.MP4
-│       └── Linear lens angle 2-9.MP4
-└── output/                   # Corrected output (after running)
+├── calibrate_camera.py           # Calibration script
+├── undistort_media.py             # Undistortion script
+├── requirements.txt               # Python dependencies
+├── README.md
+└── data/
+    ├── input/                     # Raw wide-lens videos (to be corrected)
+    │   ├── Wide lens video.MP4
+    │   └── Wide lens angle 2-9.MP4
+    ├── ground_truth/              # Linear-lens videos (reference)
+    │   ├── Linear Lens video.MP4
+    │   └── Linear lens angle 2-9.MP4
+    ├── output/                    # Corrected wide-lens videos
+    │   └── *_corrected.MP4
+    └── calibration/               # Calibration artifacts
+        ├── calibration.npz
+        ├── corners_*.jpg
+        └── undistorted_sample.jpg
 ```
