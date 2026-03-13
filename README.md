@@ -149,7 +149,10 @@ Distortion D:
     ├── output/                    # Corrected wide-lens videos
     │   └── *_corrected.MP4
     └── calibration/               # Calibration artifacts
-        ├── calibration.npz
-        ├── corners_*.jpg
-        └── undistorted_sample.jpg
+        ├── calibration.npz        # Camera matrix + distortion coefficients
+        ├── undistorted_sample.jpg # Quick visual check
+        ├── corner_detection/      # Proof corners were detected correctly
+        │   └── corners_*.jpg
+        └── comparison/            # Side-by-side validation images
+            └── compare_*.jpg
 ```
