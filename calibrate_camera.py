@@ -6,32 +6,16 @@ Extracts frames from one or more checkerboard calibration videos,
 detects inner corners, and computes fisheye camera intrinsics and
 distortion coefficients using the Kannala-Brandt model
 (cv2.fisheye.calibrate). Saves results in a reusable .npz file.
-
-Usage examples:
-
-    # Calibrate from wide-lens checkerboard videos
-    python calibrate_camera.py "data/input/Wide lens video.MP4" \\
-        "data/input/Wide lens angle 3.MP4" "data/input/Wide lens angle 4.MP4" \\
-        --board-width 9 --board-height 6 --square-size 25.0 \\
-        --output data/calibration/calibration.npz --sample-dir data/calibration
-
-    # Use all 4 distortion params (less stable, sometimes needed)
-    python calibrate_camera.py "data/input/Wide lens video.MP4" --distortion-params 4
 """
 
 import argparse
 import os
 import sys
 import time
-
 import cv2
 import numpy as np
 
-
-# ---------------------------------------------------------------------------
 # Frame extraction
-# ---------------------------------------------------------------------------
-
 def extract_frames(video_path, frame_skip=10, max_frames=None, scale=1.0):
     """Yield (frame_index, frame) tuples from a video at regular intervals."""
     cap = cv2.VideoCapture(video_path)
@@ -60,11 +44,7 @@ def extract_frames(video_path, frame_skip=10, max_frames=None, scale=1.0):
 
     cap.release()
 
-
-# ---------------------------------------------------------------------------
 # Corner detection
-# ---------------------------------------------------------------------------
-
 CHECKER_FLAGS = (
     cv2.CALIB_CB_ADAPTIVE_THRESH
     | cv2.CALIB_CB_NORMALIZE_IMAGE
@@ -88,11 +68,7 @@ def detect_corners(frame, board_size):
     corners = cv2.cornerSubPix(gray, corners, SUBPIX_WINSIZE, (-1, -1), SUBPIX_CRITERIA)
     return True, corners
 
-
-# ---------------------------------------------------------------------------
 # Fisheye calibration
-# ---------------------------------------------------------------------------
-
 def calibrate_fisheye(obj_points_list, img_points_list, image_size,
                       n_distortion_params=2):
     """
@@ -141,11 +117,7 @@ def calibrate_fisheye(obj_points_list, img_points_list, image_size,
 
     return K, D, rvecs, tvecs, rms
 
-
-# ---------------------------------------------------------------------------
 # Diagnostics
-# ---------------------------------------------------------------------------
-
 def print_diagnostics(K, D, rms, n_valid, n_total, image_size):
     active_d = [i for i in range(4) if D[i, 0] != 0.0]
     print("\n" + "=" * 60)
@@ -165,11 +137,7 @@ def print_diagnostics(K, D, rms, n_valid, n_total, image_size):
         print(f"    k{i+1} = {D[i,0]:+.6f}{marker}")
     print("=" * 60 + "\n")
 
-
-# ---------------------------------------------------------------------------
 # Saving
-# ---------------------------------------------------------------------------
-
 def save_calibration(path, K, D, rms, image_size, board_size, square_size):
     np.savez(
         path,
@@ -180,11 +148,7 @@ def save_calibration(path, K, D, rms, image_size, board_size, square_size):
     )
     print(f"  Calibration saved to {path}")
 
-
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
-
 def main():
     parser = argparse.ArgumentParser(
         description="Fisheye camera calibration from checkerboard videos.",
