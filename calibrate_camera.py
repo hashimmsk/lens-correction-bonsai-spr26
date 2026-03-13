@@ -54,7 +54,6 @@ CHECKER_FLAGS = (
 SUBPIX_CRITERIA = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 SUBPIX_WINSIZE = (5, 5)
 
-
 def detect_corners(frame, board_size):
     """
     Detect checkerboard corners with sub-pixel refinement.
@@ -295,7 +294,6 @@ def main():
         print(f"  Sample undistorted frame -> {out_path}")
 
     print("\nDone. Use undistort_media.py to correct images or videos.\n")
-
 
 if __name__ == "__main__":
     main()
