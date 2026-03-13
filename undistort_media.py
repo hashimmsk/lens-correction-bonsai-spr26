@@ -4,35 +4,15 @@ Undistort images or videos using a saved fisheye calibration.
 
 Loads K and D from the .npz produced by calibrate_camera.py, then
 corrects barrel/fisheye distortion with cv2.fisheye remap.
-
-Usage examples:
-
-    # Single video
-    python undistort_media.py data/calibration/calibration.npz \\
-        "data/input/Wide lens video.MP4" -o data/output/corrected.mp4
-
-    # Multiple videos into an output directory
-    python undistort_media.py data/calibration/calibration.npz \\
-        "data/input/Wide lens angle 3.MP4" \\
-        "data/input/Wide lens angle 4.MP4" -o data/output/
-
-    # Adjust balance (0=tight crop, 1=keep full FOV with black borders)
-    python undistort_media.py data/calibration/calibration.npz \\
-        input.mp4 -o out.mp4 --balance 0.3
 """
 
 import argparse
 import os
 import sys
-
 import cv2
 import numpy as np
 
-
-# ---------------------------------------------------------------------------
 # Calibration loading
-# ---------------------------------------------------------------------------
-
 def load_calibration(path):
     """Load K, D, image_size from a .npz calibration file."""
     data = np.load(path)
@@ -46,11 +26,7 @@ def load_calibration(path):
     print(f"  D = {D.flatten()}")
     return K, D, image_size
 
-
-# ---------------------------------------------------------------------------
 # Undistortion map builder
-# ---------------------------------------------------------------------------
-
 def build_undistort_maps(K, D, image_size, balance=0.0, fov_scale=1.0):
     """
     Compute undistortion + rectification remap arrays.
@@ -79,27 +55,17 @@ def remap_frame(frame, map1, map2):
     return cv2.remap(frame, map1, map2, interpolation=cv2.INTER_LINEAR,
                      borderMode=cv2.BORDER_CONSTANT)
 
-
-# ---------------------------------------------------------------------------
 # File-type helpers
-# ---------------------------------------------------------------------------
-
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp"}
 VIDEO_EXTS = {".mp4", ".avi", ".mov", ".mkv", ".wmv", ".flv", ".m4v"}
-
 
 def is_image(path):
     return os.path.splitext(path)[1].lower() in IMAGE_EXTS
 
-
 def is_video(path):
     return os.path.splitext(path)[1].lower() in VIDEO_EXTS
 
-
-# ---------------------------------------------------------------------------
 # Processing
-# ---------------------------------------------------------------------------
-
 def _maps_for_resolution(K, D, cal_size, actual_size, balance, fov_scale):
     """Return (map1, map2) scaled to actual_size if it differs from cal_size."""
     if actual_size == cal_size:
@@ -115,7 +81,6 @@ def _maps_for_resolution(K, D, cal_size, actual_size, balance, fov_scale):
           f"to {actual_size[0]}x{actual_size[1]}")
     return m1, m2
 
-
 def process_image(src, dst, K, D, cal_size, balance, fov_scale):
     img = cv2.imread(src)
     if img is None:
@@ -126,7 +91,6 @@ def process_image(src, dst, K, D, cal_size, balance, fov_scale):
     corrected = remap_frame(img, m1, m2)
     cv2.imwrite(dst, corrected)
     print(f"  {src} -> {dst}")
-
 
 def process_video(src, dst, K, D, cal_size, balance, fov_scale, codec="mp4v"):
     cap = cv2.VideoCapture(src)
@@ -163,11 +127,7 @@ def process_video(src, dst, K, D, cal_size, balance, fov_scale, codec="mp4v"):
     writer.release()
     print(f"  {src} -> {dst}  ({count} frames)         ")
 
-
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
-
 def main():
     parser = argparse.ArgumentParser(
         description="Undistort images/videos using a fisheye calibration.",
@@ -229,7 +189,6 @@ def main():
             print(f"  [WARN] Unknown file type: {src}")
 
     print("\nDone.")
-
 
 if __name__ == "__main__":
     main()
